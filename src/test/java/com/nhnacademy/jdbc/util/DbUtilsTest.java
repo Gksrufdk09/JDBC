@@ -23,7 +23,7 @@ class DbUtilsTest {
 
     @Test
     @DisplayName("mysql driver load : success")
-    void mtsql_driverLoadTest(){
+    void mysql_driverLoadTest(){
         try {
             Class<?> driver = Class.forName("com.mysql.cj.jdbc.Driver");
             log.info("driver:{}", driver.getName());
@@ -50,5 +50,7 @@ class DbUtilsTest {
             throw new RuntimeException(e);
         }
     }
+
+
 
 }
