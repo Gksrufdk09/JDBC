@@ -21,7 +21,7 @@ class BasicConnectionPoolTest {
     @BeforeAll
     static void setUp() {
         //todo#0 - jdbcUrl, username, password를 설정하세요
-        basicConnectionPool = new BasicConnectionPool(com.mysql.cj.jdbc.Driver.class.getName(),"","","",5);
+        basicConnectionPool = new BasicConnectionPool(com.mysql.cj.jdbc.Driver.class.getName(),"jdbc:mysql://ip:3306/database/nhn_academy_49","nhn_academy_49","B_JQs4)8vOC359!X",5);
     }
 
     @AfterAll
@@ -34,7 +34,7 @@ class BasicConnectionPoolTest {
     @DisplayName("Driver not found Exception")
     void init(){
         Assertions.assertThrows(RuntimeException.class,
-            ()-> new BasicConnectionPool("org.mariadb.jdbc.Driver","jdbcUrl","userName","password",5)
+            ()-> new BasicConnectionPool("org.mariadb.jdbc.Driver","jdbc:mysql://ip:3306/database/nhn_academy_49","nhn_academy_49","",5)
         );
     }
 
