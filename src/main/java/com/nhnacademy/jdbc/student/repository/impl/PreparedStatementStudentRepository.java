@@ -10,31 +10,102 @@ import java.util.Optional;
 
 @Slf4j
 public class PreparedStatementStudentRepository implements StudentRepository {
-
+    // PreparedStatement를 이용한 student crud 구현
     @Override
     public int save(Student student){
         //todo#1 학생 등록
+        String sql = "insert into jdbc_students(id, name, gender, age) values(?,?,?,?)";
 
-        return 0;
+        try( Connection connection = DbUtils.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+        ){
+            statement.setString(1,student.getId());
+            statement.setString(2,student.getName());
+            statement.setString(3, student.getGender().toString());
+            statement.setInt(4,student.getAge());
+
+            int result = statement.executeUpdate();
+            log.debug("save:{}", result);
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Optional<Student> findById(String id){
         //todo#2 학생 조회
+        String sql = "select * from jdbc_students where id = ?";
+        log.debug("findById:{}", sql);
+
+        ResultSet rs = null;
+        try(Connection connection = DbUtils.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+        ){
+            statement.setString(1,id);
+            rs = statement.executeQuery();
+            if(rs.next()){
+                Student student = new Student(rs.getString("id"),
+                        rs.getString("name"),
+                        Student.GENDER.valueOf(rs.getString("gender")),
+                        rs.getInt("age"),
+                        rs.getTimestamp("created_at").toLocalDateTime()
+                );
+                return Optional.of(student);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                rs.close();
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+        }
         return Optional.empty();
     }
 
     @Override
     public int update(Student student){
+        String sql = "update jdbc_students set name = ?, gender = ?, age = ? where id = ?";
+        log.debug("update:{}", sql);
         //todo#3 학생 수정 , name 수정
 
-        return 0;
+        try( Connection connection = DbUtils.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ){
+            int index = 0;
+            statement.setString(++index, student.getName());
+            statement.setString(++index, student.getGender().toString());
+            statement.setInt(++index, student.getAge());
+            statement.setString(++index,student.getId());
+
+            int result = statement.executeUpdate();
+            log.debug("update:{}", result);
+            return result;
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
     public int deleteById(String id){
         //todo#4 학생 삭제
-        return 0;
+        String sql = "delete from jdbc_students where id = ?";
+        log.debug("deleteById:{}", sql);
+
+        try (Connection connection = DbUtils.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ){
+            statement.setString(1,id);
+            int result = statement.executeUpdate();
+            log.debug("deleteById:{}", result);
+            return result;
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
 }
